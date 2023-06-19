@@ -1,0 +1,37 @@
+name: Deploy EC2 Instance
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-1
+
+                  - name: Create EC2 Instance
+        run: |
+          subnet_id=$(aws ec2 describe-subnets --filters "Name=tag:Name,Values=MySubnet" --query "Subnets[0].SubnetId" --output text)
+          security_group_id=$(aws ec2 describe-security-groups --filters "Name=tag:Name,Values=MySecurityGroup" --query "SecurityGroups[0].GroupId" --output text)
+          
+          aws ec2 run-instances \
+            --image-id ami-0d52744d6551d851e \
+            --instance-type t2.micro \
+            --key-name tushar-key \
+            --security-group-ids $security_group_id \
+            --subnet-id $subnet_id \
+            --tag-specifications 'ResourceType=instance,Tags=[{Key=github-actions,Value=MyInstance}]' \
+            --count 1
+
+
