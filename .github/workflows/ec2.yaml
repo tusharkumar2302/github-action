@@ -22,7 +22,7 @@ jobs:
 
       - name: Create EC2 Instance
         run: |
-          subnet_id=$(aws ec2 describe-subnets --filters "Name=tag:Numo123,Values=MyAppSubnet" --query "Subnets[0].SubnetId" --output text)
+          subnet_id=$(aws ec2 describe-subnets --filters "Name=tag:Name,Values=MyAppSubnet" --query "Subnets[0].SubnetId" --output text)
 
           aws ec2 run-instances \
             --image-id ami-0d52744d6551d851e \
