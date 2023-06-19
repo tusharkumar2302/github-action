@@ -20,18 +20,16 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-northeast-1
 
-                  - name: Create EC2 Instance
+      - name: Create EC2 Instance
         run: |
-          subnet_id=$(aws ec2 describe-subnets --filters "Name=tag:Name,Values=MySubnet" --query "Subnets[0].SubnetId" --output text)
-          security_group_id=$(aws ec2 describe-security-groups --filters "Name=tag:Name,Values=MySecurityGroup" --query "SecurityGroups[0].GroupId" --output text)
-          
+          subnet_id=$(aws ec2 describe-subnets --filters "Name=tag:Numo123,Values=MyAppSubnet" --query "Subnets[0].SubnetId" --output text)
+          security_group_id=$(aws ec2 describe-security-groups --filters "Name=tag:Numo123,Values=MyAppSecurityGroup" --query "SecurityGroups[0].GroupId" --output text)
+
           aws ec2 run-instances \
             --image-id ami-0d52744d6551d851e \
             --instance-type t2.micro \
             --key-name tushar-key \
             --security-group-ids $security_group_id \
             --subnet-id $subnet_id \
-            --tag-specifications 'ResourceType=instance,Tags=[{Key=github-actions,Value=MyInstance}]' \
+            --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=MyInstance}]' \
             --count 1
-
-
